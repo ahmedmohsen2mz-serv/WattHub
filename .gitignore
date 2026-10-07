@@ -1,0 +1,33 @@
+# Runtime data
+.powerk-data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Certificates (never commit these!)
+*.pem
+*.key
+*.crt
+*.p12
+
+# Environment
+.env
+.env.local
