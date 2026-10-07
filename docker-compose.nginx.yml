@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  watthub:
+    build: .
+    container_name: watthub
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./.watthub-data:/app/.watthub-data
+    environment:
+      - TZ=UTC
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
