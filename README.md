@@ -213,6 +213,15 @@ All POST endpoints additionally require `X-CSRF-Token` header matching the CSRF 
 
 ## 🏠 Deployment Options
 
+### Docker / Docker Compose (Recommended)
+We provide a secure Docker setup with automatic HTTPS via Caddy. 
+For detailed instructions, please read the [DOCKER_SETUP.md](DOCKER_SETUP.md) guide.
+
+```bash
+cp .env.example .env
+docker-compose up -d --build
+```
+
 ### Local (Home Network)
 ```bash
 python server.py serve
