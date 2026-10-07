@@ -1,3 +1,7 @@
 {"ts": "2026-10-07T11:14:13Z", "action": "device_connect", "ip": "127.0.0.1", "user": "", "details": "MTTL CDDEEFF model=LGU+-TAP-HW002 fw=1.0.66"}
 {"ts": "2026-10-07T11:14:14Z", "action": "device_disconnect", "ip": "127.0.0.1", "user": "", "details": "MTTL CDDEEFF"}
 {"ts": "2026-10-07T11:14:46Z", "action": "server_start", "ip": "108.181.242.7", "user": "", "details": "port=8090 auth=no"}
+{"ts": "2026-10-07T12:53:52Z", "action": "server_start", "ip": "0.0.0.0", "user": "", "details": "port=8080 auth=yes"}
+{"ts": "2026-10-07T12:56:19Z", "action": "server_start", "ip": "0.0.0.0", "user": "", "details": "port=8080 auth=yes"}
+{"ts": "2026-10-07T12:59:18Z", "action": "server_start", "ip": "0.0.0.0", "user": "", "details": "port=8080 auth=yes"}
+{"ts": "2026-10-07T12:59:47Z", "action": "server_start", "ip": "0.0.0.0", "user": "", "details": "port=8080 auth=yes"}
