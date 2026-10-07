@@ -18,3 +18,12 @@
 {"ts": "2026-10-07T14:07:58Z", "action": "server_start", "ip": "0.0.0.0", "user": "", "details": "port=8080 auth=yes"}
 {"ts": "2026-10-07T14:08:06Z", "action": "device_connect", "ip": "156.197.41.39", "user": "", "details": "MTTL 9797CF6 model=lgutap fw=0.1.50-1.0.60"}
 {"ts": "2026-10-07T14:09:27Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=1 on=False ok=True"}
+{"ts": "2026-10-07T14:10:07Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=1 on=True ok=True"}
+{"ts": "2026-10-07T14:10:09Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=4 on=True ok=True"}
+{"ts": "2026-10-07T14:10:22Z", "action": "server_start", "ip": "0.0.0.0", "user": "", "details": "port=8080 auth=yes"}
+{"ts": "2026-10-07T14:10:33Z", "action": "device_connect", "ip": "156.197.41.39", "user": "", "details": "MTTL 9797CF6 model=lgutap fw=0.1.50-1.0.60"}
+{"ts": "2026-10-07T14:53:48Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=1 on=False ok=True"}
+{"ts": "2026-10-07T14:53:54Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=4 on=False ok=True"}
+{"ts": "2026-10-07T14:53:55Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=1 on=True ok=True"}
+{"ts": "2026-10-07T14:54:46Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=1 on=False ok=True"}
+{"ts": "2026-10-07T14:54:48Z", "action": "onoff", "ip": "156.197.41.39", "user": "admin", "details": "mac=88D039797CF6 outlet=1 on=True ok=True"}
