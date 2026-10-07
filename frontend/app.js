@@ -621,49 +621,97 @@ const App = (() => {
     const activeOutlets = devices.reduce((s, d) => s + d.outlets.filter(o => o.on).length, 0);
     const totalOutlets = devices.length * 4;
 
-    let statsHtml = `
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Total Power</div>
-          <div class="stat-value accent">${totalPower.toFixed(1)}<span class="unit">W</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Energy Used</div>
-          <div class="stat-value info">${totalEnergy.toFixed(3)}<span class="unit">kWh</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Strips Online</div>
-          <div class="stat-value">${onlineCount}<span class="unit">/ ${devices.length}</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Active Outlets</div>
-          <div class="stat-value">${activeOutlets}<span class="unit">/ ${totalOutlets}</span></div>
-        </div>
-      </div>`;
+    // Check if we already have the skeleton
+    if (!el.querySelector('.stats-grid') || el.querySelectorAll('.device-card').length !== devices.length) {
+      let statsHtml = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Power</div>
+            <div class="stat-value accent" id="dash-tot-power">${totalPower.toFixed(1)}<span class="unit">W</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Energy Used</div>
+            <div class="stat-value info" id="dash-tot-energy">${totalEnergy.toFixed(3)}<span class="unit">kWh</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Strips Online</div>
+            <div class="stat-value" id="dash-tot-online">${onlineCount}<span class="unit">/ ${devices.length}</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Outlets</div>
+            <div class="stat-value" id="dash-tot-outlets">${activeOutlets}<span class="unit">/ ${totalOutlets}</span></div>
+          </div>
+        </div>`;
+      let devicesHtml = devices.map(d => renderDeviceCard(d)).join('');
+      el.innerHTML = statsHtml + '<div class="device-section">' + devicesHtml + '</div>';
 
-    // Devices
-    let devicesHtml = devices.map(d => renderDeviceCard(d)).join('');
-
-    el.innerHTML = statsHtml + '<div class="device-section">' + devicesHtml + '</div>';
-
-    // Attach outlet click handlers
-    el.querySelectorAll('[data-outlet-click]').forEach(card => {
-      card.addEventListener('click', () => {
-        const mac = card.dataset.mac;
-        const outlet = parseInt(card.dataset.outlet);
-        const on = card.dataset.on === 'true';
-        toggleOutlet(mac, outlet, !on);
+      // Attach handlers
+      el.querySelectorAll('[data-outlet-click]').forEach(card => {
+        card.addEventListener('click', () => {
+          const mac = card.dataset.mac;
+          const outlet = parseInt(card.dataset.outlet);
+          const on = card.dataset.on === 'true';
+          toggleOutlet(mac, outlet, !on);
+        });
       });
-    });
-
-    // Master toggle
-    el.querySelectorAll('[data-master-toggle]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mac = btn.dataset.mac;
-        const on = btn.dataset.on === 'true';
-        toggleOutlet(mac, 0, !on);
+      el.querySelectorAll('[data-master-toggle]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mac = btn.dataset.mac;
+          const on = btn.dataset.on === 'true';
+          toggleOutlet(mac, 0, !on);
+        });
       });
-    });
+    } else {
+      // In-place update
+      document.getElementById('dash-tot-power').innerHTML = `${totalPower.toFixed(1)}<span class="unit">W</span>`;
+      document.getElementById('dash-tot-energy').innerHTML = `${totalEnergy.toFixed(3)}<span class="unit">kWh</span>`;
+      document.getElementById('dash-tot-online').innerHTML = `${onlineCount}<span class="unit">/ ${devices.length}</span>`;
+      document.getElementById('dash-tot-outlets').innerHTML = `${activeOutlets}<span class="unit">/ ${totalOutlets}</span>`;
+
+      devices.forEach((d, i) => {
+        const card = el.querySelectorAll('.device-card')[i];
+        if (!card) return;
+        const rssi = rssiLevel(d.rssi);
+        
+        card.className = `device-card ${d.online ? '' : 'offline'}`;
+        card.querySelector('.device-icon').textContent = d.online ? '⚡' : '💤';
+        
+        const masterBtn = card.querySelector('[data-master-toggle]');
+        masterBtn.className = `btn btn-sm master-toggle ${d.on ? 'is-on' : 'is-off'}`;
+        masterBtn.textContent = d.on ? '⏻ ALL OFF' : '⏻ ALL ON';
+        masterBtn.disabled = !d.online;
+        masterBtn.dataset.on = d.on;
+
+        // Detail chips update
+        const vals = card.querySelectorAll('.detail-chip .val');
+        if (vals.length >= 4) {
+          vals[0].textContent = d.voltage ? d.voltage + ' V' : '—';
+          vals[1].textContent = d.current_a ? d.current_a + ' A' : '—';
+          vals[2].textContent = d.rssi ? d.rssi + ' dBm (' + rssi.label + ')' : '—';
+          vals[3].textContent = timeAgo(d.last_seen);
+        }
+
+        d.outlets.forEach((o, j) => {
+          const outCard = card.querySelectorAll('.outlet-card')[j];
+          if (!outCard) return;
+          const pending = State.pendingOutlets.has(`${d.mac}-${o.n}`);
+          
+          outCard.className = `outlet-card ${o.on ? 'on' : ''} ${pending ? 'pending' : ''}`;
+          outCard.dataset.on = o.on;
+          
+          const toggle = outCard.querySelector('.toggle-switch');
+          toggle.className = `toggle-switch ${o.on ? 'on' : ''} ${pending ? 'pending' : ''}`;
+
+          const stats = outCard.querySelectorAll('.outlet-stat');
+          if (stats.length >= 4) {
+            stats[0].innerHTML = `<strong>${o.power_w}</strong> W`;
+            stats[1].innerHTML = `<strong>${o.energy_kwh}</strong> kWh`;
+            stats[2].innerHTML = `<strong>${o.temp_c}</strong> °C`;
+            stats[3].innerHTML = o.on ? '<strong style="color:var(--on)">ON</strong>' : '<strong style="color:var(--off-text)">OFF</strong>';
+          }
+        });
+      });
+    }
   }
 
   function renderDeviceCard(device) {
