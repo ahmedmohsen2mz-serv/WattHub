@@ -753,33 +753,44 @@ const App = (() => {
     }
 
     const device = State.devices[0];
-    el.innerHTML = `
-      <div class="chart-section">
-        <div class="chart-header">
-          <div class="chart-title">⚡ Power Consumption — ${escapeHtml(device.name)}</div>
+
+    // Only render the skeleton if it's not already there to prevent flickering
+    if (!el.querySelector('#power-chart')) {
+      el.innerHTML = `
+        <div class="chart-section">
+          <div class="chart-header">
+            <div class="chart-title" id="chart-title">⚡ Power Consumption — ${escapeHtml(device.name)}</div>
+          </div>
+          <div class="chart-canvas-container">
+            <canvas class="chart-canvas" id="power-chart"></canvas>
+          </div>
         </div>
-        <div class="chart-canvas-container">
-          <canvas class="chart-canvas" id="power-chart"></canvas>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Current Power</div>
-          <div class="stat-value accent">${device.power_w.toFixed(1)}<span class="unit">W</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Voltage</div>
-          <div class="stat-value info">${device.voltage || '—'}<span class="unit">V</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Current Draw</div>
-          <div class="stat-value warning">${device.current_a || '—'}<span class="unit">A</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Total Energy</div>
-          <div class="stat-value">${device.energy_kwh.toFixed(3)}<span class="unit">kWh</span></div>
-        </div>
-      </div>`;
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Current Power</div>
+            <div class="stat-value accent"><span id="val-power">${device.power_w.toFixed(1)}</span><span class="unit">W</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Voltage</div>
+            <div class="stat-value info"><span id="val-volt">${device.voltage || '—'}</span><span class="unit">V</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Current Draw</div>
+            <div class="stat-value warning"><span id="val-curr">${device.current_a || '—'}</span><span class="unit">A</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Energy</div>
+            <div class="stat-value"><span id="val-energy">${device.energy_kwh.toFixed(3)}</span><span class="unit">kWh</span></div>
+          </div>
+        </div>`;
+    } else {
+      // Update values in place
+      document.getElementById('chart-title').textContent = `⚡ Power Consumption — ${device.name}`;
+      document.getElementById('val-power').textContent = device.power_w.toFixed(1);
+      document.getElementById('val-volt').textContent = device.voltage || '—';
+      document.getElementById('val-curr').textContent = device.current_a || '—';
+      document.getElementById('val-energy').textContent = device.energy_kwh.toFixed(3);
+    }
 
     // Fetch and draw chart
     try {
