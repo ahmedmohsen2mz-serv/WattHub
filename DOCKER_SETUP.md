@@ -1,43 +1,30 @@
-# WattHub Secure Docker Deployment Guide (HTTPS)
+# WattHub Secure Docker Deployment Guide
 
-This setup uses **Caddy** to automatically handle SSL/HTTPS encryption. It supports two modes: Self-Signed (no domain needed) or Let's Encrypt (requires a domain).
+This setup runs WattHub using Docker on the host network mode, allowing it to seamlessly integrate with your system's `Nginx` for HTTPS/SSL.
 
 ## Prerequisites
 - Docker & Docker Compose installed
-- Ports `80`, `443`, and `10086` open on your server's firewall.
+- Port `10086` open on your server's firewall (for the strip connection)
+- Nginx installed and configured as a reverse proxy for port `8080` (for the dashboard)
 
 ---
 
-## 🚀 Step 1: Choose Your Encryption Mode
+## 🚀 Step 1: Configure Environment Variables
 
-Rename the file `.env.example` to `.env`:
+Create your `.env` file to set your admin credentials:
 ```bash
 cp .env.example .env
+nano .env
 ```
 
-Open the `.env` file and choose your mode:
-
-### Mode 1: Self-Signed (No Domain - Default)
-Leave the file as is:
-```env
-DOMAIN=:443
-TLS_EMAIL=internal
-```
-*Note: Your browser will show a "Not Secure / Self-Signed" warning when you visit the page. This is normal because you don't have a domain. The traffic is still 100% encrypted. Just click "Advanced" -> "Proceed to site".*
-
-### Mode 2: Official SSL (Requires a Domain)
-Edit the file to look like this:
-```env
-DOMAIN=power.yourdomain.com
-TLS_EMAIL=your-email@example.com
-```
-*Note: This will automatically generate a free, trusted Let's Encrypt certificate.*
+Edit the `.env` file to set your desired `ADMIN_USERNAME` and `ADMIN_PASSWORD`.
+*(If you skip this, the defaults will be `admin` / `admin`)*.
 
 ---
 
 ## 🚀 Step 2: Start the Server
 
-Run the following command:
+Run the following command in the WattHub directory:
 
 ```bash
 docker-compose up -d --build
@@ -45,21 +32,15 @@ docker-compose up -d --build
 
 ---
 
-## 🛠️ Step 3: First-Time Setup (Create Admin Account)
+## 🔌 Step 3: Provision Your Smart Strip (From your Laptop)
 
-1. Open your browser and navigate to **`https://YOUR_IP_OR_DOMAIN`**
-2. You will be automatically redirected to the **Setup Screen**.
-3. Enter your desired **Username** and a strong **Password**.
-4. Click **Create Account**.
+**CRITICAL:** You must run this command from a device that has a physical WiFi card (like your personal laptop or phone). You **cannot** run this from your cloud server (VPS).
 
----
-
-## 🔌 Step 4: Provision Your Smart Strip
-
-To connect your MTTL-W01 smart strip, run the `provision` command from *inside* the container:
-
+1. Hold the physical button on the smart strip for ~10 seconds until the LED blinks fast.
+2. From your **personal laptop**, connect to the WiFi network the strip broadcasts (e.g., `TONLY_TAP_...`).
+3. Open a terminal on your laptop, navigate to your cloned `WattHub` repo, and run:
 ```bash
-docker exec -it WattHub python3 server.py provision --ip YOUR_SERVER_IP --ssid "YOUR_WIFI_NAME" --password "YOUR_WIFI_PASSWORD"
+python server.py provision --ip YOUR_VPS_IP --ssid "YOUR_HOME_WIFI" --password "YOUR_HOME_WIFI_PASSWORD"
 ```
 
 ---
@@ -68,7 +49,7 @@ docker exec -it WattHub python3 server.py provision --ip YOUR_SERVER_IP --ssid "
 
 ### View Logs
 ```bash
-docker-compose logs -f
+docker logs -f watthub
 ```
 
 ### Stop the Server
