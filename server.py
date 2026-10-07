@@ -1017,10 +1017,16 @@ async def cmd_serve(args) -> int:
     # Credentials
     creds = load_credentials()
     if not creds and not args.no_auth:
-        if sys.stdin.isatty():
+        admin_user = os.environ.get("ADMIN_USERNAME")
+        admin_pass = os.environ.get("ADMIN_PASSWORD")
+        if admin_user and admin_pass:
+            save_credentials(admin_user, admin_pass)
+            creds = load_credentials()
+            print(f"[!] Auto-provisioned credentials for '{admin_user}' from environment variables.")
+        elif sys.stdin.isatty():
             creds = setup_wizard()
         else:
-            print("[!] No credentials found. Run interactively for setup, or use --no-auth for LAN-only mode.")
+            print("[!] No credentials found. Provide ADMIN_USERNAME and ADMIN_PASSWORD env vars, run interactively for setup, or use --no-auth for LAN-only mode.")
             return 1
 
     WebHandler.hub = hub

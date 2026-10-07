@@ -78,13 +78,17 @@ On first run, you'll be prompted to create an admin account:
   ✓ Account 'admin' created successfully.
 ```
 
-### 2. Provision the Strip
+### 2. Provision the Strip (Done from your Personal Computer, NOT the VPS)
 
+**Important Distinction:** This step must be run from a local computer (like your laptop) that has a WiFi card. It **cannot** be run from the cloud server (VPS) because your server cannot connect to the physical smart strip's WiFi network.
+
+1. On your physical smart strip, hold the button for ~10 seconds until the LED blinks fast to enter setup mode.
+2. From your **personal laptop**, connect to the WiFi network the strip broadcasts (usually named `TONLY_TAP_XXXXXXX` or `LGU_XXXXXXX`). The strip's network might ask for a password (check the sticker on the back of the strip).
+3. While connected to the strip's WiFi, open a terminal on your laptop, navigate to the cloned `WattHub` folder, and run:
 ```bash
-# Put strip in setup mode (hold button ~10s until LED blinks fast)
-# Connect to the strip's WiFi: TONLY_TAP_XXXXXXX / LGU_XXXXXXX
-python server.py provision --ip YOUR_SERVER_IP --ssid "HOME_WIFI" --password "WIFI_PW"
+python server.py provision --ip YOUR_VPS_IP --ssid "YOUR_HOME_WIFI" --password "YOUR_HOME_WIFI_PASSWORD"
 ```
+*(If your laptop is assigned a gateway other than `192.168.1.1` by the strip, append `--host 192.168.x.1` to the command).*
 
 ### 3. Open the Dashboard
 
@@ -214,11 +218,19 @@ All POST endpoints additionally require `X-CSRF-Token` header matching the CSRF 
 ## 🏠 Deployment Options
 
 ### Docker / Docker Compose (Recommended)
-We provide a secure Docker setup with automatic HTTPS via Caddy. 
+We provide a secure Docker setup with automatic HTTPS via Nginx/Caddy. 
 For detailed instructions, please read the [DOCKER_SETUP.md](DOCKER_SETUP.md) guide.
 
+Before starting, copy the environment file and set your desired credentials:
 ```bash
 cp .env.example .env
+# Edit .env to set ADMIN_USERNAME and ADMIN_PASSWORD
+nano .env
+```
+*(If you do not set these in the `.env` file, the default login will be `admin` / `admin`)*.
+
+Then, start the container:
+```bash
 docker-compose up -d --build
 ```
 

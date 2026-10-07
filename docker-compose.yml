@@ -1,35 +1,14 @@
 version: '3.8'
 
 services:
-  caddy:
-    image: caddy:2-alpine
-    container_name: caddy-proxy
-    restart: unless-stopped
-    ports:
-      - "80:80"     # Required for Let's Encrypt HTTP challenge
-      - "443:443"   # Secure HTTPS Web Dashboard
-    environment:
-      - DOMAIN=${DOMAIN:-:443}
-      - TLS_EMAIL=${TLS_EMAIL:-internal}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - WattHub
-
-  WattHub:
+  watthub:
     build: .
-    container_name: WattHub
+    container_name: watthub
     restart: unless-stopped
-    ports:
-      - "10086:10086" # Smart Strip TCP port (must be exposed to the internet)
+    network_mode: host
     volumes:
-      - watthub_data:/app/.watthub-data
+      - ./.watthub-data:/app/.watthub-data
     environment:
       - TZ=UTC
-
-volumes:
-  watthub_data:
-  caddy_data:
-  caddy_config:
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
